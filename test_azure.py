@@ -13,5 +13,5 @@ response = client.responses.create(
     model=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
     input="What model are you?"
 )
-
+print("Deployment:", os.getenv("AZURE_OPENAI_DEPLOYMENT"))
 print(response.output_text)
