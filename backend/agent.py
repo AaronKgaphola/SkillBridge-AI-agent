@@ -267,6 +267,8 @@ End with a motivational sentence about their potential."""
             for tool_call in message.tool_calls:
                 tool_name = tool_call.function.name
                 tool_args = json.loads(tool_call.function.arguments)
+                print(f"Calling tool: {tool_name}")
+                print(f"Arguments: {tool_args}")
                 tool_result = call_tool(tool_name, tool_args)
                 messages.append({
                     "role": "tool",
@@ -280,13 +282,13 @@ End with a motivational sentence about their potential."""
 # Quick test — run this file directly to check everything works
 if __name__ == "__main__":
     test_profile = {
-        "name": "Sipho Dlamini",
-        "skills": ["Python", "Git", "AWS"],
-        "education": "Grade 12 / Matric",
-        "location": "Gauteng",
-        "target_role": "Cloud Engineer",
-        "budget": "free"
-    }
+    "name": "Thando",
+    "skills": ["HTML", "CSS", "JavaScript"],
+    "education": "Diploma in IT",
+    "location": "Western Cape",
+    "target_role": "Frontend Developer",
+    "budget": "free"
+}
     print("Testing SkillBridge agent...")
     result = run_skillbridge_agent(test_profile)
     print(result)
