@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SkillBridge — AI Career Agent for SA Youth</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f6fa; color: #1a1a2e; }
+  .hero { background: linear-gradient(135deg, #0078d4, #00a4ef);
+          color: white; padding: 60px 20px; text-align: center; }
+  .hero h1 { font-size: 3rem; font-weight: 700; margin-bottom: 8px; }
+  .hero p  { font-size: 1.1rem; opacity: .9; max-width: 540px; margin: 0 auto 16px; }
+  .hero small { opacity: .7; font-size: 13px; }
+  .container { max-width: 760px; margin: 0 auto; padding: 40px 20px; }
+  .card { background: white; border-radius: 12px; padding: 36px;
+          box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+  .card h2 { font-size: 1.3rem; margin-bottom: 28px; color: #1a1a2e; }
+  .form-group { margin-bottom: 22px; }
+  label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 7px; color: #333; }
+  input, select { width: 100%; padding: 11px 14px; border: 2px solid #e0e0e0;
+                  border-radius: 8px; font-size: 15px; transition: border-color .2s;
+                  font-family: inherit; }
+  input:focus, select:focus { outline: none; border-color: #0078d4; }
+  .skill-box { display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+               border: 2px solid #e0e0e0; padding: 8px; border-radius: 8px;
+               min-height: 52px; cursor: text; transition: border-color .2s; }
+  .skill-box:focus-within { border-color: #0078d4; }
+  .skill-box input { border: none; flex: 1; min-width: 140px; padding: 4px 6px;
+                     font-size: 15px; }
+  .skill-box input:focus { outline: none; }
+  .tag { background: #e3f2fd; color: #1565c0; padding: 5px 10px;
+         border-radius: 20px; font-size: 13px; font-weight: 500;
+         display: flex; align-items: center; gap: 6px; }
+  .tag-x { cursor: pointer; color: #888; line-height: 1; }
+  .tag-x:hover { color: #d32f2f; }
+  .btn { background: #0078d4; color: white; border: none; padding: 14px;
+         border-radius: 8px; font-size: 17px; font-weight: 600;
+         cursor: pointer; width: 100%; transition: background .2s;
+         font-family: inherit; letter-spacing: .01em; }
+  .btn:hover:not(:disabled) { background: #005ba1; }
+  .btn:disabled { background: #ccc; cursor: not-allowed; }
+  .voice-btn { margin-top: 8px; padding: 8px 16px; border-radius: 6px;
+               border: 2px solid #0078d4; background: none; color: #0078d4;
+               cursor: pointer; font-size: 13px; font-family: inherit; }
+  .voice-btn:hover { background: #e3f2fd; }
+  .loading { text-align: center; padding: 50px; display: none; }
+  .loading.show { display: block; }
+  .spinner { width: 52px; height: 52px; border: 4px solid #e0e0e0;
+             border-top-color: #0078d4; border-radius: 50%;
+             animation: spin 1s linear infinite; margin: 0 auto 18px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .status-text { font-size: 15px; color: #555; margin-bottom: 6px; }
+  .status-sub  { font-size: 13px; color: #999; }
+  .result { display: none; margin-top: 32px; }
+  .result.show { display: block; }
+  .result-box { background: white; border-radius: 12px; padding: 32px;
+                box-shadow: 0 4px 24px rgba(0,0,0,.08);
+                white-space: pre-wrap; line-height: 1.8; font-size: 15px; }
+  .share-bar { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .share-btn { padding: 10px 20px; border-radius: 8px; border: 2px solid #0078d4;
+               background: none; color: #0078d4; font-size: 14px; font-weight: 600;
+               cursor: pointer; font-family: inherit; }
+  .share-btn:hover { background: #e3f2fd; }
+  footer { text-align: center; padding: 40px 20px; font-size: 13px; color: #888;
+           border-top: 1px solid #eee; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>SkillBridge</h1>
+  <p>Your AI career agent for breaking into South African tech</p>
+  <small>Powered by Azure AI Foundry · Built with GitHub Copilot · Made for SA Youth</small>
+</div>
+
+<div class="container">
+  <div class="card">
+    <h2>Tell me about yourself</h2>
+
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="name" placeholder="e.g. Thabo Nkosi">
+    </div>
+
+    <div class="form-group">
+      <label>Your Current Skills <small style="font-weight:400;color:#666">— press Enter after each skill</small></label>
+      <div class="skill-box" id="sbox" onclick="document.getElementById('sinput').focus()">
+        <input id="sinput" placeholder="Type a skill and press Enter...">
+      </div>
+      <button class="voice-btn" onclick="startVoice()">🎤 Speak your skills instead</button>
+    </div>
+
+    <div class="form-group">
+      <label>Highest Education Level</label>
+      <select id="education">
+        <option>Grade 12 / Matric</option>
+        <option>N4/N5/N6 Certificate</option>
+        <option>National Diploma</option>
+        <option>Bachelor Degree</option>
+        <option>Currently studying</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Province</label>
+      <select id="province">
+        <option>Gauteng</option><option>Western Cape</option>
+        <option>KwaZulu-Natal</option><option>Eastern Cape</option>
+        <option>Limpopo</option><option>Mpumalanga</option>
+        <option>North West</option><option>Free State</option>
+        <option>Northern Cape</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Target Role</label>
+      <select id="role">
+        <option>Software Developer</option>
+        <option>Cloud Engineer</option>
+        <option>Systems Developer</option>
+        <option>Data Analyst</option>
+        <option>Cybersecurity Analyst</option>
+        <option>IT Support Specialist</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Learning Budget</label>
+      <select id="budget">
+        <option value="free">Free resources only</option>
+        <option value="low">Low — under R3,000</option>
+        <option value="medium">Medium — R3,000 to R10,000</option>
+      </select>
+    </div>
+
+    <button class="btn" onclick="submit()" id="btn">Analyse My Career Path</button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="status-text">SkillBridge is analysing your profile...</div>
+    <div class="status-sub">Calling 4 tools against the SA job market · ~20 seconds</div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="result-box" id="result-content"></div>
+    <div class="share-bar">
+      <button class="share-btn" onclick="copyResult()">Copy Report</button>
+      <button class="share-btn" onclick="location.reload()">Analyse Again</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  SkillBridge · Microsoft Agents League Hackathon 2026 · Hack for Good · Built by [Your Name] · Orange Farm, Gauteng
+</footer>
+
+<script>
+var skills = [];
+
+document.getElementById('sinput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    var val = this.value.trim().replace(/,$/, '');
+    if (val && skills.indexOf(val) === -1) {
+      skills.push(val);
+      renderTags();
+      this.value = '';
+    }
+  }
+});
+
+function removeSkill(s) {
+  skills = skills.filter(function(x) { return x !== s; });
+  renderTags();
+}
+
+function renderTags() {
+  var box = document.getElementById('sbox');
+  var input = document.getElementById('sinput');
+  box.querySelectorAll('.tag').forEach(function(t) { t.remove(); });
+  skills.forEach(function(s) {
+    var tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.innerHTML = s + ' <span class="tag-x" onclick="removeSkill(\'' + s.replace(/'/g, "\\'") + '\')">×</span>';
+    box.insertBefore(tag, input);
+  });
+}
+
+function startVoice() {
+  var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) { alert('Voice not supported in this browser. Use Chrome.'); return; }
+  var rec = new SpeechRec();
+  rec.lang = 'en-ZA';
+  rec.onresult = function(e) {
+    var spoken = e.results[0][0].transcript;
+    spoken.split(/[,and]+/).forEach(function(s) {
+      s = s.trim();
+      if (s && skills.indexOf(s) === -1) { skills.push(s); renderTags(); }
+    });
+  };
+  rec.onerror = function() { alert('Could not hear you. Try again in a quiet space.'); };
+  rec.start();
+}
+
+function submit() {
+  var name = document.getElementById('name').value.trim();
+  if (!name) { alert('Please enter your name'); return; }
+  if (skills.length === 0) { alert('Please add at least one skill'); return; }
+
+  var btn = document.getElementById('btn');
+  btn.disabled = true; btn.textContent = 'Analysing...';
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('result').classList.remove('show');
+
+  fetch('http://localhost:5000/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name:        name,
+      skills:      skills,
+      education:   document.getElementById('education').value,
+      location:    document.getElementById('province').value,
+      target_role: document.getElementById('role').value,
+      budget:      document.getElementById('budget').value
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    document.getElementById('loading').classList.remove('show');
+    document.getElementById('result').classList.add('show');
+    document.getElementById('result-content').textContent = d.result || d.error;
+    btn.disabled = false; btn.textContent = 'Analyse My Career Path';
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+  })
+  .catch(function() {
+    document.getElementById('loading').classList.remove('show');
+    alert('Cannot connect to SkillBridge server.\n\nMake sure you ran: python backend/app.py');
+    btn.disabled = false; btn.textContent = 'Analyse My Career Path';
+  });
+}
+
+function copyResult() {
+  var text = document.getElementById('result-content').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    alert('Report copied to clipboard!');
+  });
+}
+</script>
+</body>
+</html>
